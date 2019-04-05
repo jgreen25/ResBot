@@ -21,9 +21,10 @@ class ResBot():
         self.email = email
         self.password = password
         self.number = number
-        options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        self.driver = webdriver.Chrome(chrome_options = options)
+        #options = webdriver.ChromeOptions()
+        #options.add_argument('headless')
+        #self.driver = webdriver.Chrome(chrome_options = options)
+        self.driver = webdriver.Chrome() ####
 
     def resy_login(self, email, password):
         try:
@@ -40,10 +41,12 @@ class ResBot():
         log_in.click()
         by_email_btn = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, \
-                "//*[contains(text(), 'Use Email and Password instead')]")))
-        by_email_btn.click()
-        self.driver.find_element_by_name('email').send_keys(
-            email)
+            "//button[contains(text(), 'Use Email and Password instead')]")))
+        by_email_btn.send_keys(Keys.ENTER)
+        email_input = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, \
+            "//input[@name='email']")))
+        email_input.send_keys(email)
         self.driver.find_element_by_name('password').send_keys(
             password)
         self.driver.find_element_by_class_name('Button').click()
@@ -51,7 +54,6 @@ class ResBot():
     
     def resy_make_res(
             self, date_time, day_limit, seats, card_number, card_exp, card_cvv):
-        self.driver.find_element_by_class_name('ResyButton').click()
         while True:
             current_time = datetime.datetime.now()
             if current_time + datetime.timedelta(day_limit) \
@@ -59,11 +61,17 @@ class ResBot():
                 break
         self.driver.get(self.url + 'date=' + str(date_time)[:10] \
             + '&seats=' + seats)
-        times = self.driver.find_elements_by_class_name('time')
-        for i in range(len(times)):
-            if times[i].getText() == self.make_time(str(date_time)):
-                time = times[i]
-                time.find_element_by_xpath('./../..').click()
+        #times = self.driver.find_elements_by_class_name('time')
+        #for i in range(len(times)):
+            #if times[i].getText() == self.make_time(str(date_time)):
+                #time = times[i]
+                #time.find_element_by_xpath('./../..').click()
+        #time_btn = WebDriverWait(self.driver, 10).until(
+            #EC.presence_of_element_located((By.XPATH, \
+            #"//div[contains(text(), %s)]" % self.make_time(date_time))))
+        time_btn = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, \
+            "div:contains(%s)" % self.make_time(date_time))))
         cards = self.driver.find_elements_by_tag_name('option')
         self.driver.find_element_by_class_name('button primary').click()
         if len(cards) == 1:
@@ -76,9 +84,11 @@ class ResBot():
         return
             
     def make_time(self, date_time):
-        time = date_time[11:16]
+        time = str(date_time)[11:16]
         if int(time[:2]) > 12:
             time = str(int(time[:2]) - 12) + time[2:] + 'PM'
+        elif int(time[:2]) == 12:
+            time += 'PM'
         else:
             time += 'AM'
         return time
@@ -88,7 +98,7 @@ def main():
     date_time = datetime.datetime(2019, 4, 8, 12)
     bot = ResBot(
         'https://resy.com/cities/atx/odd-duck?date=2019-04-08&seats=2', \
-        True, date_time, 0, '2', '4900710010458914', '1120', '602', \
+        True, date_time, 4, '2', '4900710010458914', '1120', '602', \
         'jgreen25tu@gmail.com', 'hawkeny0GHM', '6785758996')
     print("Bot created.")
     bot.resy_login(bot.email, bot.password)
