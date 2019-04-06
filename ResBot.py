@@ -50,6 +50,9 @@ class ResBot():
         self.driver.find_element_by_name('password').send_keys(
             password)
         self.driver.find_element_by_class_name('Button').click()
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, \
+            'profileMenu')))
         return
     
     def resy_make_res(
@@ -61,19 +64,24 @@ class ResBot():
                 break
         self.driver.get(self.url + 'date=' + str(date_time)[:10] \
             + '&seats=' + seats)
-        #times = self.driver.find_elements_by_class_name('time')
-        #for i in range(len(times)):
-            #if times[i].getText() == self.make_time(str(date_time)):
-                #time = times[i]
-                #time.find_element_by_xpath('./../..').click()
-        #time_btn = WebDriverWait(self.driver, 10).until(
-            #EC.presence_of_element_located((By.XPATH, \
-            #"//div[contains(text(), %s)]" % self.make_time(date_time))))
-        time_btn = WebDriverWait(self.driver, 10).until(
+        WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, \
-            "div:contains(%s)" % self.make_time(date_time))))
-        cards = self.driver.find_elements_by_tag_name('option')
-        self.driver.find_element_by_class_name('button primary').click()
+            '.time')))
+        times = self.driver.find_elements_by_css_selector('.time')
+        for i in range(len(times)):
+            if times[i].text == self.make_time(date_time):
+                time = times[i]
+                break
+        time.find_element_by_xpath('../..').click()
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, \
+            "//button[contains(@class, 'button') and" \
+            + "contains(@class, 'primary')]")))
+        try:
+            cards = self.driver.find_elements_by_tag_name('option')
+        except:
+            cards = []
+        self.driver.find_element_by_css_selector('.button.primary').click()
         if len(cards) == 1:
             self.driver.find_element_by_id('credit-card-number').send_keys(
                 card_number)
