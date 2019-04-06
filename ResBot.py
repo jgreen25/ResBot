@@ -73,15 +73,17 @@ class ResBot():
                 time = times[i]
                 break
         time.find_element_by_xpath('../..').click()
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, \
-            "//button[contains(@class, 'button') and" \
-            + "contains(@class, 'primary')]")))
+        page = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, \
+            '.active')))
+        reserve_btn = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, \
+            '.legal')))
         try:
             cards = self.driver.find_elements_by_tag_name('option')
         except:
             cards = []
-        self.driver.find_element_by_css_selector('.button.primary').click()
+        element = self.driver.find_element_by_class_name('processing-spinner')
         if len(cards) == 1:
             self.driver.find_element_by_id('credit-card-number').send_keys(
                 card_number)
