@@ -73,9 +73,8 @@ class ResBot():
                 time = times[i]
                 break
         time.find_element_by_xpath('../..').click()
-        page = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, \
-            '.active')))
+        iframe = self.driver.find_elements_by_tag_name('iframe')[1]
+        self.driver.switch_to_frame(iframe)
         reserve_btn = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, \
             '.legal')))
@@ -83,7 +82,8 @@ class ResBot():
             cards = self.driver.find_elements_by_tag_name('option')
         except:
             cards = []
-        element = self.driver.find_element_by_class_name('processing-spinner')
+        button = self.driver.find_element_by_css_selector('.book-reservation')
+        button.find_elements_by_xpath('.//*')[5].click()
         if len(cards) == 1:
             self.driver.find_element_by_id('credit-card-number').send_keys(
                 card_number)
@@ -91,6 +91,9 @@ class ResBot():
                 card_exp)
             self.driver.find_element_by_id('cvv').send_keys(card_cvv)
             self.driver.find_element_by_class_name('primary').click()
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, \
+            '.special-request')))
         return
             
     def make_time(self, date_time):
@@ -107,7 +110,7 @@ class ResBot():
 def main():
     date_time = datetime.datetime(2019, 4, 8, 12)
     bot = ResBot(
-        'https://resy.com/cities/atx/odd-duck?date=2019-04-08&seats=2', \
+        'https://resy.com/cities/atx/odd-duck?', \
         True, date_time, 4, '2', '4900710010458914', '1120', '602', \
         'jgreen25tu@gmail.com', 'hawkeny0GHM', '6785758996')
     print("Bot created.")
