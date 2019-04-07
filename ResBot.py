@@ -7,11 +7,10 @@ import datetime
 
 
 class ResBot():
-    def __init__(self, url, acnt_status, date_time, day_limit, seats, \
+    def __init__(self, url, date_time, day_limit, seats, \
             card_number, card_exp, card_cvv, email = None, \
-            password = None, number = None):
+            password = None):
         self.url = url
-        self.acnt_status = acnt_status
         self.date_time = date_time
         self.day_limit = day_limit
         self.seats = seats
@@ -20,11 +19,9 @@ class ResBot():
         self.card_cvv = card_cvv
         self.email = email
         self.password = password
-        self.number = number
-        #options = webdriver.ChromeOptions()
-        #options.add_argument('headless')
-        #self.driver = webdriver.Chrome(chrome_options = options)
-        self.driver = webdriver.Chrome() ####
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+        self.driver = webdriver.Chrome(chrome_options = options)
 
     def resy_login(self, email, password):
         try:
@@ -83,7 +80,12 @@ class ResBot():
         except:
             cards = []
         button = self.driver.find_element_by_css_selector('.book-reservation')
-        button.find_elements_by_xpath('.//*')[5].click()
+        children = button.find_elements_by_xpath('.//*')
+        for child in children:
+            try:
+                child.click()
+            except:
+                continue
         if len(cards) == 1:
             self.driver.find_element_by_id('credit-card-number').send_keys(
                 card_number)
