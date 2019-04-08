@@ -24,10 +24,10 @@ class ResBot():
         options.add_argument('headless')
         self.__driver = webdriver.Chrome(chrome_options = options)
 
-    def resy_login(self):
+    def resy_login(self, url, seats):
         current_time = str(datetime.datetime.now())
-        self.__driver.get(self.url + 'date=' + current_time[:10] \
-            + '&seats=' + self.seats)
+        self.__driver.get(url + 'date=' + current_time[:10] \
+            + '&seats=' + seats)
         log_in  = WebDriverWait(self.__driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, \
             '.ResyProfileMenu__log-in.no-animate')))
@@ -85,8 +85,10 @@ class ResBot():
             except:
                 continue
         if len(cards) == 1:
-            self.__driver.find_element_by_id('credit-card-number').send_keys(
-                self.__card_number)
+            card_num = WebDriverWait(self.__driver, 10).until(
+                EC.presence_of_element_located((By.ID, \
+                'credit-card-number')))
+            card_num.send_keys(self.__card_number)
             self.__driver.find_element_by_id('expiration').send_keys(
                 self.__card_exp)
             self.__driver.find_element_by_id('cvv').send_keys(self.__card_cvv)
@@ -96,6 +98,17 @@ class ResBot():
             '.special-request')))
         self.__driver.quit()
         return
+
+    def open_table_login(self, url):
+        self.__driver.get(url)
+        WebDriverWait(self.__driver, 10).until(
+            EC.presence_of_element_located((By.ID, \
+            'glocal_nav_sign_in')))
+        ################ continue here ##################
+        return
+
+    def open_table_make_res(self):
+        pass
             
     def _make_time(self, date_time):
         time = str(date_time)[11:16]
